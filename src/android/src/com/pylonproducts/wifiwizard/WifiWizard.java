@@ -31,6 +31,21 @@ import android.net.wifi.SupplicantState;
 import android.content.Context;
 import android.util.Log;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.util.ArrayList;
 
 public class WifiWizard extends CordovaPlugin {
 
@@ -239,7 +254,7 @@ public class WifiWizard extends CordovaPlugin {
     }
 
     /**
-     *    This method connects a network.
+     *    This method connects a network (modified).
      *
      *    @param    callbackContext        A Cordova callback context
      *    @param    data                JSON Array, with [0] being SSID to connect
@@ -252,6 +267,7 @@ public class WifiWizard extends CordovaPlugin {
             Log.d(TAG, "WifiWizard: connectNetwork invalid data.");
             return false;
         }
+
         String ssidToConnect = "";
 
         try {
@@ -339,6 +355,14 @@ public class WifiWizard extends CordovaPlugin {
         }
     }
 
+    private String getCreatorName(WifiConfiguration config) {
+        try {
+            return (String)(config.getClass().getDeclaredField("creatorName").get(config));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     /**
      *    This method uses the callbackContext.success method to send a JSONArray
      *    of the currently configured networks.
@@ -349,12 +373,17 @@ public class WifiWizard extends CordovaPlugin {
      */
     private boolean listNetworks(CallbackContext callbackContext) {
         Log.d(TAG, "WifiWizard: listNetworks entered.");
+
         List<WifiConfiguration> wifiList = wifiManager.getConfiguredNetworks();
 
         JSONArray returnList = new JSONArray();
 
         for (WifiConfiguration wifi : wifiList) {
-            returnList.put(wifi.SSID);
+            String creatorName = getCreatorName(wifi);
+            JSONObject net = new JSONObject();
+            net.put("ssid", wifi.SSID);
+            net.put("creatorName", creatorName);
+            returnList.put(net);
         }
 
         callbackContext.success(returnList);
@@ -452,8 +481,7 @@ public class WifiWizard extends CordovaPlugin {
         if (wifiManager.startScan()) {
             callbackContext.success();
             return true;
-        }
-        else {
+        } else {
             callbackContext.error("Scan failed");
             return false;
         }
