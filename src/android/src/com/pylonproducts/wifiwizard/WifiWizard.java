@@ -35,7 +35,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -68,7 +67,7 @@ public class WifiWizard extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        this.wifiManager = (WifiManager) cordova.getActivity().getSystemService(Context.WIFI_SERVICE);
+        this.wifiManager = (WifiManager) cordova.getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     @Override
@@ -380,10 +379,14 @@ public class WifiWizard extends CordovaPlugin {
 
         for (WifiConfiguration wifi : wifiList) {
             String creatorName = getCreatorName(wifi);
-            JSONObject net = new JSONObject();
-            net.put("ssid", wifi.SSID);
-            net.put("creatorName", creatorName);
-            returnList.put(net);
+            try {
+                JSONObject net = new JSONObject();
+                net.put("ssid", wifi.SSID);
+                net.put("creatorName", creatorName);
+                returnList.put(net);
+            } catch (Exception e) {
+                // do nothing
+            }
         }
 
         callbackContext.success(returnList);
