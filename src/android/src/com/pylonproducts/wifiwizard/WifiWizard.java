@@ -234,7 +234,7 @@ public class WifiWizard extends CordovaPlugin {
                     JSONObject output = new JSONObject();
                     output.put("msg", newSSID + " successfully added.");
                     output.put("ssid", newSSID);
-                    output.put("netId", newNetId);
+                    output.put("networkId", newNetId);
                     output.put("assignment", "DHCP");
                     callbackContext.success(output);
                 }
@@ -243,7 +243,7 @@ public class WifiWizard extends CordovaPlugin {
                     JSONObject output = new JSONObject();
                     output.put("msg", newSSID + " successfully updated.");
                     output.put("ssid", newSSID);
-                    output.put("netId", updatedNetId);
+                    output.put("networkId", updatedNetId);
                     callbackContext.success(output);
                 }
 
@@ -281,7 +281,7 @@ public class WifiWizard extends CordovaPlugin {
                         JSONObject output = new JSONObject();
                         output.put("msg", newSSID + " successfully added with static config.");
                         output.put("ssid", newSSID);
-                        output.put("netId", netId);
+                        output.put("networkId", netId);
                         output.put("assignment", "STATIC");
                         output.put("assignmentDone", true);
                         callbackContext.success(output);
@@ -289,7 +289,7 @@ public class WifiWizard extends CordovaPlugin {
                         JSONObject output = new JSONObject();
                         output.put("msg", newSSID + " successfully added with static config.");
                         output.put("ssid", newSSID);
-                        output.put("netId", netId);
+                        output.put("networkId", netId);
                         output.put("assignment", "STATIC");
                         output.put("assignmentDone", false);
                         callbackContext.success(output);
@@ -304,7 +304,7 @@ public class WifiWizard extends CordovaPlugin {
                         JSONObject output = new JSONObject();
                         output.put("msg", newSSID + " successfully added.");
                         output.put("ssid", newSSID);
-                        output.put("netId", newNetId);
+                        output.put("networkId", newNetId);
                         output.put("assignment", "DHCP");
                         callbackContext.success(output);
                     }
@@ -313,7 +313,7 @@ public class WifiWizard extends CordovaPlugin {
                         JSONObject output = new JSONObject();
                         output.put("msg", newSSID + " successfully updated.");
                         output.put("ssid", newSSID);
-                        output.put("netId", updatedNetId);
+                        output.put("networkId", updatedNetId);
                         output.put("assignment", "DHCP");
                         callbackContext.success(output);
                     }
