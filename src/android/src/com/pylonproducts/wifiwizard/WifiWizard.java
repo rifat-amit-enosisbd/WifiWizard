@@ -159,6 +159,19 @@ public class WifiWizard extends CordovaPlugin {
         return type.cast(field.get(object));
     }
 
+    private static Object callGetMethod(Object object, String methodName) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        Method method = object.getClass().getDeclaredMethod(methodName);
+        return method.invoke(object);
+    }
+
+    private String getIpAssignment(WifiConfiguration config) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+        Object out = callGetMethod(config, "getIpAssignment");
+        if (out != null) {
+            return out.toString();
+        } else {
+            return "";
+        }
+    }
 
 
     private static boolean setStaticIpConfiguration(WifiManager manager, WifiConfiguration config, InetAddress ipAddress, int prefixLength, InetAddress gateway, InetAddress[] dns) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, InstantiationException {
@@ -525,11 +538,13 @@ public class WifiWizard extends CordovaPlugin {
 
         for (WifiConfiguration wifi : wifiList) {
             String creatorName = getCreatorName(wifi);
+            String ipAssignmentVal = getIpAssignment(wifi);
             try {
                 JSONObject net = new JSONObject();
                 net.put("ssid", wifi.SSID);
                 net.put("creatorName", creatorName);
                 net.put("networkId", wifi.networkId);
+                net.put("ipAssignment", ipAssignmentVal);
                 returnList.put(net);
             } catch (Exception e) {
                 // do nothing
