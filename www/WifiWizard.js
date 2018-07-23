@@ -122,13 +122,16 @@ var WifiWizard = {
             switch (wifi.auth.algorithm) {
                 case 'WPA':
                     networkInformation.push('WPA');
-                networkInformation.push(wifi.auth.password);
+                    networkInformation.push(wifi.auth.password);
                 break;
                 case 'NONE':
                     networkInformation.push('NONE');
+                    networkInformation.push('');
                 break;
                 case 'Newly supported type':
                     // Push values in specific order, and implement new type in the Java code.
+                    networkInformation.push('NONE');
+                    networkInformation.push('');
                     break;
                 default:
                     console.log("WifiWizard: authentication invalid.");
@@ -138,6 +141,17 @@ var WifiWizard = {
         else {
             console.log('WifiWizard: No authentication algorithm given.');
             return false;
+        }
+
+        if (wifi.assignment !== undefined && wifi.assignment === "STATIC") {
+            networkInformation.push("STATIC");
+            networkInformation.push(wifi.ipAddress);
+            networkInformation.push(wifi.prefixLength);
+            networkInformation.push(wifi.gatewayAddress);
+            networkInformation.push(wifi.dns1);
+            networkInformation.push(wifi.dns2);
+        } else {
+            networkInformation.push("DHCP");
         }
 
         cordova.exec(win, fail, 'WifiWizard', 'addNetwork', networkInformation);
