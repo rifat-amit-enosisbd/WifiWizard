@@ -231,11 +231,20 @@ public class WifiWizard extends CordovaPlugin {
 
                 if ( wifi.networkId == -1 ) {
                     int newNetId = wifiManager.addNetwork(wifi);
-                    callbackContext.success({ msg: newSSID + " successfully added.", ssid: newSSID, netId: newNetId });
+                    JSONObject output = new JSONObject();
+                    output.put("msg", newSSID + " successfully added.");
+                    output.put("ssid", newSSID);
+                    output.put("netId", newNetId);
+                    output.put("assignment", "DHCP");
+                    callbackContext.success(output);
                 }
                 else {
                     int updatedNetId = wifiManager.updateNetwork(wifi);
-                    callbackContext.success({ msg: newSSID + " successfully updated.", ssid: newSSID, netId: updatedNetId });
+                    JSONObject output = new JSONObject();
+                    output.put("msg", newSSID + " successfully updated.");
+                    output.put("ssid", newSSID);
+                    output.put("netId", updatedNetId);
+                    callbackContext.success(output);
                 }
 
                 wifiManager.saveConfiguration();
@@ -269,9 +278,21 @@ public class WifiWizard extends CordovaPlugin {
                         prefixLength,
                         InetAddress.getByName(gatewayAddress),
                         new InetAddress[]{InetAddress.getByName(dns1), InetAddress.getByName(dns2)})) {
-                        callbackContext.success({ msg: newSSID + " successfully added with static config.", ssid: newSSID, netId: netId, assignment: "STATIC", assignmentDone: true });
+                        JSONObject output = new JSONObject();
+                        output.put("msg", newSSID + " successfully added with static config.");
+                        output.put("ssid", newSSID);
+                        output.put("netId", netId);
+                        output.put("assignment", "STATIC");
+                        output.put("assignmentDone", true);
+                        callbackContext.success(output);
                     } else {
-                        callbackContext.success({ msg: newSSID + " successfully added but failed to set static config", ssid: newSSID, netId: netId, assignment: "STATIC", assignmentDone: false });
+                        JSONObject output = new JSONObject();
+                        output.put("msg", newSSID + " successfully added with static config.");
+                        output.put("ssid", newSSID);
+                        output.put("netId", netId);
+                        output.put("assignment", "STATIC");
+                        output.put("assignmentDone", false);
+                        callbackContext.success(output);
                     }
 
                     wifiManager.saveConfiguration();
@@ -280,11 +301,21 @@ public class WifiWizard extends CordovaPlugin {
 
                     if ( wifi.networkId == -1 ) {
                         int newNetId = wifiManager.addNetwork(wifi);
-                        callbackContext.success({ msg: newSSID + " successfully added.", ssid: newSSID, netId: newNetId, assignment: "DHCP" });
+                        JSONObject output = new JSONObject();
+                        output.put("msg", newSSID + " successfully added.");
+                        output.put("ssid", newSSID);
+                        output.put("netId", newNetId);
+                        output.put("assignment", "DHCP");
+                        callbackContext.success(output);
                     }
                     else {
                         int updatedNetId = wifiManager.updateNetwork(wifi);
-                        callbackContext.success({ msg: newSSID + " successfully updated.", ssid: newSSID, netId: updatedNetId, assignment: "DHCP" });
+                        JSONObject output = new JSONObject();
+                        output.put("msg", newSSID + " successfully updated.");
+                        output.put("ssid", newSSID);
+                        output.put("netId", updatedNetId);
+                        output.put("assignment", "DHCP");
+                        callbackContext.success(output);
                     }
 
                     wifiManager.saveConfiguration();
