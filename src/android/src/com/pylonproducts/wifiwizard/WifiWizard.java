@@ -120,6 +120,68 @@ public class WifiWizard extends CordovaPlugin {
         return false;
     }
 
+    private static Object getEnumValue(String enumClassName, String enumValue) throws ClassNotFoundException {
+        Class<Enum> enumClz = (Class<Enum>) Class.forName(enumClassName);
+        return Enum.valueOf(enumClz, enumValue);
+    }
+
+
+    private static void callMethod(Object object, String methodName, String[] parameterTypes, Object[] parameterValues) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        Class<?>[] parameterClasses = new Class<?>[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++)
+            parameterClasses[i] = Class.forName(parameterTypes[i]);
+
+        Method method = object.getClass().getDeclaredMethod(methodName, parameterClasses);
+        method.invoke(object, parameterValues);
+    }
+
+    private static Object newInstance(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+        return newInstance(className, new Class<?>[0], new Object[0]);
+    }
+
+    private static Object newInstance(String className, Class<?>[] parameterClasses, Object[] parameterValues) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
+        Class<?> clz = Class.forName(className);
+        Constructor<?> constructor = clz.getConstructor(parameterClasses);
+        return constructor.newInstance(parameterValues);
+    }
+
+    private static void setField(Object object, String fieldName, Object value) throws IllegalAccessException, IllegalArgumentException, NoSuchFieldException {
+        Field field = object.getClass().getDeclaredField(fieldName);
+        field.set(object, value);
+    }
+
+    private static <T> T getField(Object object, String fieldName, Class<T> type) throws IllegalAccessException, IllegalArgumentException, NoSuchFieldException {
+        Field field = object.getClass().getDeclaredField(fieldName);
+        return type.cast(field.get(object));
+    }
+
+
+
+    private static boolean setStaticIpConfiguration(WifiManager manager, WifiConfiguration config, InetAddress ipAddress, int prefixLength, InetAddress gateway, InetAddress[] dns) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, InstantiationException {
+        // First set up IpAssignment to STATIC.
+        Object ipAssignment = getEnumValue("android.net.IpConfiguration$IpAssignment", "STATIC");
+        callMethod(config, "setIpAssignment", new String[]{"android.net.IpConfiguration$IpAssignment"}, new Object[]{ipAssignment});
+
+        // Then set properties in StaticIpConfiguration.
+        Object staticIpConfig = newInstance("android.net.StaticIpConfiguration");
+        Object linkAddress = newInstance("android.net.LinkAddress", new Class<?>[]{InetAddress.class, int.class}, new Object[]{ipAddress, prefixLength});
+
+        setField(staticIpConfig, "ipAddress", linkAddress);
+        setField(staticIpConfig, "gateway", gateway);
+        getField(staticIpConfig, "dnsServers", ArrayList.class).clear();
+        for (int i = 0; i < dns.length; i++)
+            getField(staticIpConfig, "dnsServers", ArrayList.class).add(dns[i]);
+
+        callMethod(config, "setStaticIpConfiguration", new String[]{"android.net.StaticIpConfiguration"}, new Object[]{staticIpConfig});
+        int netId = manager.updateNetwork(config);
+        boolean result = netId != -1;
+        if (result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * This methods adds a network to the list of available WiFi networks.
      * If the network already exists, then it updates it.
@@ -137,6 +199,12 @@ public class WifiWizard extends CordovaPlugin {
         try {
             // data's order for ANY object is 0: ssid, 1: authentication algorithm,
             // 2+: authentication information.
+            // 3: "STATIC" if you want to set static ip
+            // 4: STATIC mode : ip address (string)
+            // 5: STATIC mode : prefix length (int)
+            // 6: STATIC mode : gateway ip (string)
+            // 7: STATIC mode : dns 1 (string)
+            // 8: STATIC mode : dns 2 (string)
             String authType = data.getString(1);
 
 
@@ -183,18 +251,45 @@ public class WifiWizard extends CordovaPlugin {
                 String newSSID = data.getString(0);
                 wifi.SSID = newSSID;
                 wifi.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                wifi.networkId = ssidToNetworkId(newSSID);
 
-                if ( wifi.networkId == -1 ) {
-                    wifiManager.addNetwork(wifi);
-                    callbackContext.success(newSSID + " successfully added.");
-                }
-                else {
-                    wifiManager.updateNetwork(wifi);
-                    callbackContext.success(newSSID + " successfully updated.");
+                String defaultFunction = data.getString(3);
+                if (defaultFunction.indexOf('STATIC') > -1) {
+                    int netId = wifiManager.addNetwork(wifi);
+                    wifi.networkId = netId;
+
+                    // perform static settings
+                    String ipAddress = data.getString(4);
+                    int prefixLength = data.getInt(5);
+                    String gatewayAddress = data.getString(6);
+                    String dns1 = data.getString(7);
+                    String dns2 = data.getString(8);
+
+                    if (setStaticIpConfiguration(wifiManager, wifi,
+                        InetAddress.getByName(ipAddress),
+                        prefixLength,
+                        InetAddress.getByName(gatewayAddress),
+                        new InetAddress[]{InetAddress.getByName(dns1), InetAddress.getByName(dns2)})) {
+                        callbackContext.success(newSSID + " successfully added with static configuration.");
+                    } else {
+                        callbackContext.success(newSSID + " successfully but failed to set static configuration");
+                    }
+
+                    wifiManager.saveConfiguration();
+                } else {
+                    wifi.networkId = ssidToNetworkId(newSSID);
+
+                    if ( wifi.networkId == -1 ) {
+                        wifiManager.addNetwork(wifi);
+                        callbackContext.success(newSSID + " successfully added.");
+                    }
+                    else {
+                        wifiManager.updateNetwork(wifi);
+                        callbackContext.success(newSSID + " successfully updated.");
+                    }
+
+                    wifiManager.saveConfiguration();
                 }
 
-                wifiManager.saveConfiguration();
                 return true;
             }
             // TODO: Add more authentications as necessary
