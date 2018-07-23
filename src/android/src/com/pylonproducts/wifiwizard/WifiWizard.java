@@ -164,7 +164,7 @@ public class WifiWizard extends CordovaPlugin {
         return method.invoke(object);
     }
 
-    private String getIpAssignment(WifiConfiguration config) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+    private String getIpAssignment(WifiConfiguration config) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         Object out = callGetMethod(config, "getIpAssignment");
         if (out != null) {
             return out.toString();
@@ -526,7 +526,6 @@ public class WifiWizard extends CordovaPlugin {
      *    of the currently configured networks.
      *
      *    @param    callbackContext        A Cordova callback context
-     *    @param    data                JSON Array, with [0] being SSID to connect
      *    @return    true if network disconnected, false if failed
      */
     private boolean listNetworks(CallbackContext callbackContext) {
@@ -537,9 +536,9 @@ public class WifiWizard extends CordovaPlugin {
         JSONArray returnList = new JSONArray();
 
         for (WifiConfiguration wifi : wifiList) {
-            String creatorName = getCreatorName(wifi);
-            String ipAssignmentVal = getIpAssignment(wifi);
             try {
+                String creatorName = getCreatorName(wifi);
+                String ipAssignmentVal = getIpAssignment(wifi);
                 JSONObject net = new JSONObject();
                 net.put("ssid", wifi.SSID);
                 net.put("creatorName", creatorName);
