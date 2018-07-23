@@ -253,7 +253,7 @@ public class WifiWizard extends CordovaPlugin {
                 wifi.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 
                 String defaultFunction = data.getString(3);
-                if (defaultFunction.indexOf('STATIC') > -1) {
+                if (defaultFunction.indexOf("STATIC") > -1) {
                     int netId = wifiManager.addNetwork(wifi);
                     wifi.networkId = netId;
 
