@@ -303,6 +303,16 @@ var WifiWizard = {
             return;
         }
         cordova.exec(win, fail, 'WifiWizard', 'setWifiEnabled', [enabled]);
+    },
+
+    reconnect: function(win, fail) {
+        if (typeof win != "function") {
+            console.log("reconnect first parameter must be a function.");
+            return;
+        }
+        cordova.exec(
+            win, fail, 'WifiWizard', 'reconnect', []
+        );
     }
 };
 

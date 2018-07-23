@@ -59,6 +59,7 @@ public class WifiWizard extends CordovaPlugin {
     private static final String GET_CONNECTED_SSID = "getConnectedSSID";
     private static final String IS_WIFI_ENABLED = "isWifiEnabled";
     private static final String SET_WIFI_ENABLED = "setWifiEnabled";
+    private static final String RECONNECT = "reconnect";
     private static final String TAG = "WifiWizard";
 
     private WifiManager wifiManager;
@@ -109,6 +110,9 @@ public class WifiWizard extends CordovaPlugin {
         }
         else if(action.equals(DISCONNECT)) {
             return this.disconnect(callbackContext);
+        }
+        else if (action.equals(RECONNECT)) {
+            return this.reconnect(callbackContext);
         }
         else if(action.equals(GET_CONNECTED_SSID)) {
             return this.getConnectedSSID(callbackContext);
@@ -475,6 +479,23 @@ public class WifiWizard extends CordovaPlugin {
             return true;
         } else {
             callbackContext.error("Unable to disconnect from the current network");
+            return false;
+        }
+    }
+
+    /**
+     *    This method reconnnects network.
+     *
+     *    @param    callbackContext        A Cordova callback context
+     *    @return    true if network reconnected, false if failed
+     */
+    private boolean reconnect(CallbackContext callbackContext) {
+        Log.d(TAG, "WifiWizard: reconnect entered.");
+        if (wifiManager.reconnect()) {
+            callbackContext.success("Reconnected");
+            return true;
+        } else {
+            callbackContext.error("Unable to reconnect");
             return false;
         }
     }
