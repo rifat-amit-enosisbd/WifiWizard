@@ -230,12 +230,12 @@ public class WifiWizard extends CordovaPlugin {
                 wifi.networkId = ssidToNetworkId(newSSID);
 
                 if ( wifi.networkId == -1 ) {
-                    wifiManager.addNetwork(wifi);
-                    callbackContext.success(newSSID + " successfully added.");
+                    int newNetId = wifiManager.addNetwork(wifi);
+                    callbackContext.success({ msg: newSSID + " successfully added.", ssid: newSSID, netId: newNetId });
                 }
                 else {
-                    wifiManager.updateNetwork(wifi);
-                    callbackContext.success(newSSID + " successfully updated.");
+                    int updatedNetId = wifiManager.updateNetwork(wifi);
+                    callbackContext.success({ msg: newSSID + " successfully updated.", ssid: newSSID, netId: updatedNetId });
                 }
 
                 wifiManager.saveConfiguration();
@@ -269,9 +269,9 @@ public class WifiWizard extends CordovaPlugin {
                         prefixLength,
                         InetAddress.getByName(gatewayAddress),
                         new InetAddress[]{InetAddress.getByName(dns1), InetAddress.getByName(dns2)})) {
-                        callbackContext.success(newSSID + " successfully added with static configuration.");
+                        callbackContext.success({ msg: newSSID + " successfully added with static config.", ssid: newSSID, netId: netId, assignment: "STATIC", assignmentDone: true });
                     } else {
-                        callbackContext.success(newSSID + " successfully but failed to set static configuration");
+                        callbackContext.success({ msg: newSSID + " successfully added but failed to set static config", ssid: newSSID, netId: netId, assignment: "STATIC", assignmentDone: false });
                     }
 
                     wifiManager.saveConfiguration();
@@ -279,12 +279,12 @@ public class WifiWizard extends CordovaPlugin {
                     wifi.networkId = ssidToNetworkId(newSSID);
 
                     if ( wifi.networkId == -1 ) {
-                        wifiManager.addNetwork(wifi);
-                        callbackContext.success(newSSID + " successfully added.");
+                        int newNetId = wifiManager.addNetwork(wifi);
+                        callbackContext.success({ msg: newSSID + " successfully added.", ssid: newSSID, netId: newNetId, assignment: "DHCP" });
                     }
                     else {
-                        wifiManager.updateNetwork(wifi);
-                        callbackContext.success(newSSID + " successfully updated.");
+                        int updatedNetId = wifiManager.updateNetwork(wifi);
+                        callbackContext.success({ msg: newSSID + " successfully updated.", ssid: newSSID, netId: updatedNetId, assignment: "DHCP" });
                     }
 
                     wifiManager.saveConfiguration();
