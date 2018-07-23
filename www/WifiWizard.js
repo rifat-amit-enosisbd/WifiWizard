@@ -146,10 +146,10 @@ var WifiWizard = {
         if (wifi.assignment !== undefined && wifi.assignment === "STATIC") {
             networkInformation.push("STATIC");
             networkInformation.push(wifi.ipAddress);
-            networkInformation.push(wifi.prefixLength);
             networkInformation.push(wifi.gatewayAddress);
             networkInformation.push(wifi.dns1);
             networkInformation.push(wifi.dns2);
+            networkInformation.push(wifi.prefixLength);
         } else {
             networkInformation.push("DHCP");
         }

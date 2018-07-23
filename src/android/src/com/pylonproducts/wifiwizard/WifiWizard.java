@@ -259,10 +259,10 @@ public class WifiWizard extends CordovaPlugin {
 
                     // perform static settings
                     String ipAddress = data.getString(4);
-                    int prefixLength = data.getInt(5);
-                    String gatewayAddress = data.getString(6);
-                    String dns1 = data.getString(7);
-                    String dns2 = data.getString(8);
+                    String gatewayAddress = data.getString(5);
+                    String dns1 = data.getString(6);
+                    String dns2 = data.getString(7);
+                    int prefixLength = data.getInt(8);
 
                     if (setStaticIpConfiguration(wifiManager, wifi,
                         InetAddress.getByName(ipAddress),
