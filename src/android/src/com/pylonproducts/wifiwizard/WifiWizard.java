@@ -383,6 +383,7 @@ public class WifiWizard extends CordovaPlugin {
                 JSONObject net = new JSONObject();
                 net.put("ssid", wifi.SSID);
                 net.put("creatorName", creatorName);
+                net.put("networkId", wifi.networkId);
                 returnList.put(net);
             } catch (Exception e) {
                 // do nothing
