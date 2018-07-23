@@ -414,7 +414,7 @@ public class WifiWizard extends CordovaPlugin {
             // We disable the network before connecting, because if this was the last connection before
             // a disconnect(), this will not reconnect.
             // wifiManager.disableNetwork(networkIdToConnect);
-            wifiManager.enableNetwork(networkIdToConnect, true);
+            wifiManager.enableNetwork(networkId, true);
 
             SupplicantState supState;
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
