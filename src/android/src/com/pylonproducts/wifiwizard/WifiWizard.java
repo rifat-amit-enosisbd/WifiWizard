@@ -393,10 +393,10 @@ public class WifiWizard extends CordovaPlugin {
             return false;
         }
 
-        String ssidToConnect = "";
+        int networkId = -1;
 
         try {
-            ssidToConnect = data.getString(0);
+            networkId = data.getInt(0);
         }
         catch (Exception e) {
             callbackContext.error(e.getMessage());
@@ -404,12 +404,12 @@ public class WifiWizard extends CordovaPlugin {
             return false;
         }
 
-        int networkIdToConnect = ssidToNetworkId(ssidToConnect);
+        // int networkIdToConnect = ssidToNetworkId(ssidToConnect);
 
-        if (networkIdToConnect >= 0) {
+        if (networkId >= 0) {
             // We disable the network before connecting, because if this was the last connection before
             // a disconnect(), this will not reconnect.
-            wifiManager.disableNetwork(networkIdToConnect);
+            // wifiManager.disableNetwork(networkIdToConnect);
             wifiManager.enableNetwork(networkIdToConnect, true);
 
             SupplicantState supState;
@@ -417,7 +417,6 @@ public class WifiWizard extends CordovaPlugin {
             supState = wifiInfo.getSupplicantState();
             callbackContext.success(supState.toString());
             return true;
-
         }else{
             callbackContext.error("WifiWizard: cannot connect to network");
             return false;

@@ -169,12 +169,12 @@ var WifiWizard = {
 
     /**
      *	This method connects a network if it is configured.
-     *	@param	SSID	the network to connect
+     *	@param	SSID	the network id to connect
      *	@param	win		function that is called if successful
      * @param	fail		function that is called to handle errors
      */
-    connectNetwork: function(SSID, win, fail) {
-        cordova.exec(win, fail, 'WifiWizard', 'connectNetwork', [WifiWizard.formatWifiString(SSID)]);
+    connectNetwork: function(networkId, win, fail) {
+        cordova.exec(win, fail, 'WifiWizard', 'connectNetwork', [ networkId ]);
     },
 
     /**
