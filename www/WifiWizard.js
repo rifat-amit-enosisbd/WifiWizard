@@ -262,6 +262,35 @@ var WifiWizard = {
         }
         cordova.exec(win, fail, 'WifiWizard', 'getConnectedSSID', []);
     },
+
+    getCurrentSSIDWindows: function (win, fail, args) {
+        if (typeof win != "function") {
+            console.log("getCurrentSSIDWindows first parameter must be a function to handle SSID.");
+            return;
+        }
+        var wifiAdapter = Windows.Devices.WiFi.WiFiAdapter;
+        if (wifiAdapter === null || wifiAdapter === undefined) {
+            fail();
+            return;
+        }
+        wifiAdapter.findAllAdaptersAsync().done(function (result) {
+            if (result.length === 0) {
+                fail();
+                return;
+            }
+            result[0].networkAdapter.getConnectedProfileAsync().done(function (connectionProfile) {
+                if (connectionProfile !== null && connectionProfile !== undefined) {
+                    win(connectionProfile.profileName);
+                } else {
+                    fail();
+                }
+            }, function (errProfile) {
+                fail();
+            });
+        }, function (err) {
+            fail();
+        });
+    },
     
     getCurrentBSSID: function(win, fail) {
         if (typeof win != "function") {
