@@ -372,9 +372,7 @@ public class WifiWizard extends CordovaPlugin {
 
         // TODO: Verify the type of data!
         try {
-            String ssidToDisconnect = data.getString(0);
-
-            int networkIdToRemove = ssidToNetworkId(ssidToDisconnect);
+            int networkIdToRemove = data.getInt(0);
 
             if (networkIdToRemove >= 0) {
                 wifiManager.removeNetwork(networkIdToRemove);
